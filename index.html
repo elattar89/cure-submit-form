@@ -715,49 +715,45 @@
     }
 
     if(valid) {
-      // Disable button to prevent double submit
       var btn = document.querySelector('.submit-btn');
       btn.disabled = true;
       btn.textContent = 'جاري الإرسال...';
 
-      // Collect snapchat (optional, no id)
-      var snapInputs = document.querySelectorAll('input[type="url"]');
-      var snapVal = '';
-      snapInputs.forEach(function(inp){ if(inp.id !== 'instagram' && inp.id !== 'tiktok') snapVal = inp.value.trim(); });
-
-      var formData = {
-        'الاسم الثلاثي': fn.value.trim(),
-        'الجنس': genderSelected.value === 'male' ? 'ذكر' : 'أنثى',
-        'الرقم المدني': civil.value.trim(),
-        'رقم التلفون': phone.value.trim(),
-        'الجنسية': nat.value,
-        'انستاجرام': ig.value.trim(),
-        'تيك توك': tt.value.trim(),
-        'سناب شات': snapVal || 'لم يُذكر',
-        'موافقة Before & After': document.getElementById('agree3').checked ? 'نعم' : 'لا'
+      var snapInput = document.querySelector('input[placeholder="https://snapchat.com/add/username"]');
+      var data = {
+        fullname: document.getElementById('fullname').value,
+        gender: document.querySelector('input[name="gender"]:checked').value === 'male' ? 'ذكر' : 'أنثى',
+        civil: document.getElementById('civil').value,
+        phone: document.getElementById('phone').value,
+        nationality: document.getElementById('nationality').value,
+        instagram: document.getElementById('instagram').value,
+        tiktok: document.getElementById('tiktok').value,
+        snapchat: snapInput ? snapInput.value : '',
+        agree_publish: document.getElementById('agree1').checked ? 'موافق' : '',
+        agree_reuse: document.getElementById('agree2').checked ? 'موافق' : '',
+        agree_before_after: document.getElementById('agree3').checked ? 'موافق' : 'غير موافق'
       };
 
       fetch('https://formspree.io/f/xdayqyen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(data)
       })
-      .then(function(response) {
-        if(response.ok) {
+      .then(function(res) {
+        if(res.ok) {
           document.getElementById('form-container').style.display = 'none';
           document.getElementById('success-card').style.display = 'block';
         } else {
           btn.disabled = false;
           btn.textContent = 'إرسال التسجيل';
-          alert('حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.');
+          alert('حدث خطأ في الإرسال، يرجى المحاولة مجدداً');
         }
       })
       .catch(function() {
         btn.disabled = false;
         btn.textContent = 'إرسال التسجيل';
-        alert('تعذر الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.');
+        alert('حدث خطأ في الاتصال، يرجى التحقق من الإنترنت والمحاولة مجدداً');
       });
-
     } else {
       // Scroll to first error
       var firstInvalid = document.querySelector('.invalid, .err.show');
